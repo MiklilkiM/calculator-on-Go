@@ -18,101 +18,66 @@
 
 ```bash
 go version
+```
 Если Go не установлен, скачайте и установите его с официального сайта: https://golang.org/dl/
 
 Склонируйте проект с GitHub
-bash
-Копировать код
+```bash
 git clone https://github.com/MiklilkiM/calculator-on-go.git
 cd calculator-on-go
+```
 Запуск сервера
 Перейдите в папку проекта и запустите сервер:
 
-bash
-Копировать код
+```bash
 go run ./cmd/main.go
+```
 Сервис будет доступен по адресу: http://localhost:8080/api/v1/calculate.
 
-Альтернативный запуск
-Вы можете использовать скрипты для сборки и запуска:
 
-Для Linux/MacOS:
-
-bash
-Копировать код
-./build/build.sh
-Для Windows:
-
-bash
-Копировать код
-.\build\build.bat
-Эндпоинты
-POST /api/v1/calculate
-Описание: Этот эндпоинт принимает JSON с математическим выражением и возвращает результат вычислений.
-
-Пример запроса с использованием PowerShell:
-powershell
-Копировать код
-Invoke-RestMethod -Uri "http://localhost:8080/api/v1/calculate" `
--Method POST `
--Headers @{"Content-Type"="application/json"} `
--Body '{"expression": "2+2*2"}'
-Пример успешного ответа:
-json
-Копировать код
+## Примеры использования
+```json
 {
-  "result": "6.000000"
+  "expression": "ваше_выражение"
 }
-Пример ошибки 422:
-Если выражение содержит некорректный символ (например, $), сервер вернет ошибку 422:
+```
+Успешный запрос
+```bash
+curl --location 'localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "2+2*2"
+}'
+```
+Ответ:
 
-Пример запроса:
-
-powershell
-Копировать код
-Invoke-RestMethod -Uri "http://localhost:8080/api/v1/calculate" `
--Method POST `
--Headers @{"Content-Type"="application/json"} `
--Body '{"expression": "2+2$"}'
-Пример ответа:
-
-json
-Копировать код
+```json
 {
-  "error": "Invalid character in expression"
+  "result": "6"
 }
-Тестирование
-Для запуска тестов выполните команду:
+```
 
-bash
-Копировать код
-go test ./...
-Примеры cURL-запросов:
-Успешный запрос:
+Ошибка 422: некорректное выражение
+```bash
+curl --location 'localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "10/0"
+}'
+```
+Ответ:
 
-bash
-Копировать код
-curl -X POST http://localhost:8080/api/v1/calculate/ \
--H "Content-Type: application/json" \
--d '{"expression": "1 + 2"}'
-Запрос с некорректным выражением:
+```json
+{
+  "error": "Division by zero"
+}
+```
 
-bash
-Копировать код
-curl -X POST http://localhost:8080/api/v1/calculate/ \
--H "Content-Type: application/json" \
--d '{"expression": "invalid"}'
-Запрос с пустым телом:
+Ошибка 500: серверная ошибка
+Если происходит внутренняя ошибка сервера, вы получите ответ с кодом 500 и следующим сообщением:
 
-bash
-Копировать код
-curl -X POST http://localhost:8080/api/v1/calculate/ \
--H "Content-Type: application/json" \
--d ''
-Запрос с ошибкой синтаксиса:
-
-bash
-Копировать код
-curl -X POST http://localhost:8080/api/v1/calculate/ \
--H "Content-Type: application/json" \
--d '{invalid}'
+```json
+{
+  "error": "Unknown error"
+}
+```
